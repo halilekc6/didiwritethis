@@ -67,6 +67,9 @@ function spinner(message: string) {
   };
 }
 
+/** Counts as wrong, and marks a real gap instead of hiding it behind a lucky guess. */
+const DONT_KNOW = -1;
+
 function printSelection({ files, commitsScanned, agentCommits }: Selection, agent: AgentName) {
   console.log(
     `\nScanned ${commitsScanned} ${commitsScanned === 1 ? 'commit' : 'commits'} (${agentCommits} credit an agent).` +
@@ -88,10 +91,11 @@ async function takeQuiz(questions: Question[], reader: Reader): Promise<Attempt[
 
     let choice: number | null | undefined;
     while (choice === undefined) {
-      const reply = await reader.ask(`\n${dim('a/b/c/d, or x if this question is wrong:')} `);
+      const reply = await reader.ask(`\n${dim(`a/b/c/d, ? if you don't know, x if this question is wrong:`)} `);
       if (reply === null) return attempts;
       const key = reply.toLowerCase();
       if (key === 'x') choice = null;
+      else if (key === '?') choice = DONT_KNOW;
       else if (key.length === 1 && 'abcd'.includes(key)) choice = 'abcd'.indexOf(key);
     }
 
@@ -100,7 +104,8 @@ async function takeQuiz(questions: Question[], reader: Reader): Promise<Attempt[
     else if (choice === question.answer) console.log(`${green('Correct.')} ${question.explanation}`);
     else {
       const right = 'abcd'.charAt(question.answer);
-      console.log(`${red(`Wrong, it was ${right}.`)} ${question.explanation}`);
+      const verdict = choice === DONT_KNOW ? `It was ${right}.` : `Wrong, it was ${right}.`;
+      console.log(`${red(verdict)} ${question.explanation}`);
     }
   }
   return attempts;

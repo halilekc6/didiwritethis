@@ -24,7 +24,7 @@ The trial was small and measured short-term understanding of one library. So mea
 2. **Asks first.** It shows which files will be sent and waits for your yes.
 3. **Writes the quiz.** Your agent CLI writes more questions than it needs about those files.
 4. **Checks the answers.** A second, blind pass answers every question. Questions it disagrees with are dropped, and new ones replace them if needed.
-5. **Tests you.** You get 10 questions without the code: 5 on debugging, 3 on reading and 2 on concepts. Press `x` to flag a question as wrong, and it will not count.
+5. **Tests you.** You get 10 questions without the code: 5 on debugging, 3 on reading and 2 on concepts. Press `?` if you don't know, which counts as wrong. Press `x` to flag a question as wrong, and it will not count.
 6. **Scores you.** Score = correct answers / counted questions. There is no hidden weighting.
 
 | Score | Rank |
