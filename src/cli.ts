@@ -69,7 +69,7 @@ function spinner(message: string) {
 
 function printSelection({ files, commitsScanned, agentCommits }: Selection, agent: AgentName) {
   console.log(
-    `\nScanned ${commitsScanned} commits (${agentCommits} credit an agent).` +
+    `\nScanned ${commitsScanned} ${commitsScanned === 1 ? 'commit' : 'commits'} (${agentCommits} credit an agent).` +
       `\nThese ${files.length} files go to ${bold(agent)}, the agent CLI on this machine:\n`,
   );
   for (const file of files) {
