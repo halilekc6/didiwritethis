@@ -1,0 +1,18 @@
+{
+  "name": "didiwritethis",
+  "version": "0.1.0",
+  "description": "A 3-minute test of how much of your own repo you actually understand.",
+  "type": "module",
+  "bin": { "didiwritethis": "dist/cli.js" },
+  "files": ["dist/**/*.js", "!dist/**/*.test.js", "assets"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test \"dist/**/*.test.js\"",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": ["cli", "ai", "coding-agents", "claude-code", "codex", "gemini-cli", "comprehension-debt", "vibe-coding", "quiz"],
+  "license": "MIT",
+  "dependencies": { "@resvg/resvg-js": "^2.6.2" },
+  "devDependencies": { "@expo-google-fonts/jetbrains-mono": "^0.4.1", "@types/node": "^22.0.0", "typescript": "^5.6.0" }
+}
