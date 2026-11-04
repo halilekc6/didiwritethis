@@ -45,6 +45,8 @@ test('isCandidate keeps source and drops tests, builds, locks and secrets', () =
   assert.equal(isCandidate('src/app.test.ts'), false);
   assert.equal(isCandidate('tests/app.py'), false);
   assert.equal(isCandidate('dist/app.js'), false);
+  assert.equal(isCandidate('docs/prototype/engine.py'), false);
+  assert.equal(isCandidate('examples/demo.js'), false);
   assert.equal(isCandidate('package-lock.json'), false);
   assert.equal(isCandidate('src/types.d.ts'), false);
   assert.equal(isCandidate('src/credentials.py'), false);

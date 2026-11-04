@@ -29,7 +29,7 @@ const SOURCE_EXTENSIONS = new Set([
 ]);
 
 const EXCLUDED_PATH =
-  /(^|\/)(node_modules|dist|build|out|target|vendor|coverage|__generated__|generated|\.next|\.git)\//i;
+  /(^|\/)(node_modules|dist|build|out|target|vendor|coverage|__generated__|generated|\.next|\.git|docs?|examples?|samples?|prototypes?|benchmarks?)\//i;
 const EXCLUDED_NAME =
   /(\.min\.|\.d\.ts$|\.generated\.|\.gen\.|\.test\.|\.spec\.|_test\.|^test_|^conftest\.py$)/i;
 const TEST_DIR = /(^|\/)(tests?|__tests__|specs?)\//i;
