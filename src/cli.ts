@@ -6,7 +6,7 @@ import { createInterface } from 'node:readline';
 import { parseArgs } from 'node:util';
 import { AGENTS, createRunner, detectAgent, isInstalled, type AgentName } from './agents.js';
 import { badgeMarkdown, renderCard } from './card.js';
-import { repoRoot, selectFiles, type Selection } from './git.js';
+import { currentAuthors, repoRoot, selectFiles, type Selection } from './git.js';
 import { MIN_QUESTIONS, buildQuiz, type Question } from './quiz.js';
 import { scoreAttempts, type Attempt, type Score } from './score.js';
 
@@ -20,6 +20,7 @@ Options:
   --files <n>         Number of files to quiz on (default: 8)
   --out <path>        Where to write the score card (default: ~/.didiwritethis/card.png)
   --no-card           Do not write a score card
+  --everyone          Quiz on all authors' code, not just your commits
   --list              Show which files would be sent, then stop
   -y, --yes           Skip the confirmation before sending code to your agent
   -h, --help          Show this help
@@ -70,9 +71,11 @@ function spinner(message: string) {
 /** Counts as wrong, and marks a real gap instead of hiding it behind a lucky guess. */
 const DONT_KNOW = -1;
 
-function printSelection({ files, commitsScanned, agentCommits }: Selection, agent: AgentName) {
+const MIN_OWN_FILES = 3;
+
+function printSelection({ files, commitsScanned, agentCommits }: Selection, agent: AgentName, scope: string) {
   console.log(
-    `\nScanned ${commitsScanned} ${commitsScanned === 1 ? 'commit' : 'commits'} (${agentCommits} credit an agent).` +
+    `\nScanned ${scope} ${commitsScanned} ${commitsScanned === 1 ? 'commit' : 'commits'} (${agentCommits} credit an agent).` +
       `\nThese ${files.length} files go to ${bold(agent)}, the agent CLI on this machine:\n`,
   );
   for (const file of files) {
@@ -142,6 +145,7 @@ async function main(): Promise<number> {
       files: { type: 'string', default: '8' },
       out: { type: 'string' },
       'no-card': { type: 'boolean', default: false },
+      everyone: { type: 'boolean', default: false },
       list: { type: 'boolean', default: false },
       yes: { type: 'boolean', short: 'y', default: false },
       help: { type: 'boolean', short: 'h', default: false },
@@ -179,12 +183,19 @@ async function main(): Promise<number> {
     return 2;
   }
 
-  const selection = selectFiles(root, { maxFiles });
+  const authors = values.everyone ? [] : currentAuthors(root);
+  let selection = selectFiles(root, { maxFiles, authors });
+  let scope = authors.length > 0 ? 'your' : 'all';
+  if (authors.length > 0 && selection.files.length < MIN_OWN_FILES) {
+    console.log(dim('\nToo few files from your own commits, so this uses everyone\'s.'));
+    selection = selectFiles(root, { maxFiles });
+    scope = 'all';
+  }
   if (selection.files.length === 0) {
     console.error('Found no source files with commit history to quiz you on.');
     return 2;
   }
-  printSelection(selection, agent);
+  printSelection(selection, agent, scope);
   if (values.list) return 0;
 
   const reader = lineReader();

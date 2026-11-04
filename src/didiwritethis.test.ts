@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { badgeMarkdown, renderCard } from './card.js';
-import { isAgentCommit, isCandidate, parseLog, redact, selectFiles, type SourceFile } from './git.js';
+import { currentAuthors, isAgentCommit, isCandidate, parseLog, redact, selectFiles, type SourceFile } from './git.js';
 import {
   buildQuiz,
   keepConfirmed,
@@ -92,6 +92,25 @@ test('selectFiles ranks by changes and weighs agent commits higher', () => {
   assert.deepEqual(selection.files.map((file) => file.path), ['agent.ts', 'human.ts']);
   assert.equal(selection.agentCommits, 1);
   assert.equal(selection.commitsScanned, 2);
+});
+
+test('selectFiles can limit history to one author', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'diwt-test-'));
+  const commit = (name: string, file: string) => {
+    writeFileSync(join(dir, file), 'x\n'.repeat(120));
+    execFileSync('git', ['add', '.'], { cwd: dir, stdio: 'ignore' });
+    execFileSync('git', ['-c', `user.name=${name}`, '-c', `user.email=${name}@t.dev`, 'commit', '-qm', 'x'], {
+      cwd: dir,
+      stdio: 'ignore',
+    });
+  };
+  execFileSync('git', ['init', '-q'], { cwd: dir, stdio: 'ignore' });
+  commit('ann', 'ann.ts');
+  commit('bob', 'bob.ts');
+  execFileSync('git', ['config', 'user.email', 'bob@t.dev'], { cwd: dir, stdio: 'ignore' });
+  assert.ok(currentAuthors(dir).includes('bob@t.dev'));
+  assert.deepEqual(selectFiles(dir, { authors: ['bob@t.dev'] }).files.map((f) => f.path), ['bob.ts']);
+  assert.equal(selectFiles(dir).files.length, 2);
 });
 
 test('selectFiles respects the total character budget', () => {

@@ -20,7 +20,7 @@ The trial was small and measured short-term understanding of one library. So mea
 
 ## How it works
 
-1. **Picks files.** It takes the source files with the most recent changes and favours commits that credit an agent. Most agent code is not labelled, so this is a heuristic, not a detector.
+1. **Picks files.** It takes the source files you changed most in your own commits and favours commits that credit an agent. On a solo repo that is everything; use `--everyone` to include your team's code. Most agent code is not labelled, so this is a heuristic, not a detector.
 2. **Asks first.** It shows which files will be sent and waits for your yes.
 3. **Writes the quiz.** Your agent CLI writes more questions than it needs about those files.
 4. **Checks the answers.** A second, blind pass answers every question. Questions it disagrees with are dropped, and new ones replace them if needed.
@@ -67,6 +67,7 @@ Then ask your agent: "Coach me on my weak spots from didiwritethis." When you fi
 --files <n>         Number of files to quiz on (default: 8)
 --out <path>        Where to write the score card (default: ~/.didiwritethis/card.png)
 --no-card           Do not write a score card
+--everyone          Quiz on all authors' code, not just your commits
 --list              Show which files would be sent, then stop
 -y, --yes           Skip the confirmation
 ```

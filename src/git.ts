@@ -20,6 +20,8 @@ export interface SelectOptions {
   maxCharsPerFile?: number;
   maxTotalChars?: number;
   commits?: number;
+  /** Names or emails. Only their commits count. Empty means everyone. */
+  authors?: string[];
 }
 
 const SOURCE_EXTENSIONS = new Set([
@@ -56,6 +58,18 @@ export function repoRoot(cwd: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** The identities git commits under here, so a team repo quizzes you on your own work. */
+export function currentAuthors(root: string): string[] {
+  const read = (key: string) => {
+    try {
+      return git(root, ['config', key]).trim();
+    } catch {
+      return '';
+    }
+  };
+  return [read('user.email'), read('user.name')].filter(Boolean);
 }
 
 export function isCandidate(path: string): boolean {
@@ -111,10 +125,13 @@ export function parseLog(log: string): HistoryEntry[] {
 }
 
 export function selectFiles(root: string, options: SelectOptions = {}): Selection {
-  const { maxFiles = 8, maxCharsPerFile = 12_000, maxTotalChars = 60_000, commits = 300 } = options;
+  const { maxFiles = 8, maxCharsPerFile = 12_000, maxTotalChars = 60_000, commits = 300, authors = [] } = options;
 
   const tracked = new Set(git(root, ['ls-files']).split('\n').filter(Boolean));
-  const history = parseLog(git(root, ['log', `-n${commits}`, '--format=%x01%B%x02', '--numstat']));
+  const authorArgs = authors.length > 0 ? ['--fixed-strings', ...authors.map((a) => `--author=${a}`)] : [];
+  const history = parseLog(
+    git(root, ['log', `-n${commits}`, ...authorArgs, '--format=%x01%B%x02', '--numstat']),
+  );
 
   const weights = new Map<string, number>();
   let agentCommits = 0;
