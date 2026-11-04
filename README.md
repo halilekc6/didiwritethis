@@ -29,9 +29,11 @@ The trial was small and measured short-term understanding of one library. So mea
 
 | Score | Rank |
 | --- | --- |
-| 0-39% | Passenger |
-| 40-69% | Copilot |
-| 70-100% | Pilot |
+| 0-49% | Passenger |
+| 50-79% | Copilot |
+| 80-100% | Pilot |
+
+Pure guessing averages 25%, so the ranks are set well above that. Guessing reaches Copilot in about 8% of runs.
 
 You get a PNG score card and a README badge.
 
@@ -63,7 +65,7 @@ Then ask your agent: "Coach me on my weak spots from didiwritethis." When you fi
 --agent <name>      claude, codex or gemini (default: first one found)
 --questions <n>     Number of questions, 5 to 20 (default: 10)
 --files <n>         Number of files to quiz on (default: 8)
---out <path>        Where to write the score card
+--out <path>        Where to write the score card (default: ~/.didiwritethis/card.png)
 --no-card           Do not write a score card
 --list              Show which files would be sent, then stop
 -y, --yes           Skip the confirmation
@@ -76,7 +78,7 @@ Your code goes to the provider behind your own agent CLI, under your own account
 - Files such as `.env`, keys and credentials are skipped.
 - Common token patterns are redacted before sending. This is a safety net and can miss things, so check the list.
 - The agent runs in an empty directory, with tools off or read-only where the CLI allows it.
-- Your score stays in `~/.didiwritethis/history.jsonl`.
+- Your score and card stay in `~/.didiwritethis/`, outside your repo.
 - The repo name is not on the card.
 
 ## Limits

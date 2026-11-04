@@ -25,8 +25,8 @@ export interface Score extends Tally {
 }
 
 export function rankFor(percent: number): Rank {
-  if (percent >= 70) return { name: 'Pilot', line: 'You are flying this thing.' };
-  if (percent >= 40) return { name: 'Copilot', line: 'You know the route, not the engine.' };
+  if (percent >= 80) return { name: 'Pilot', line: 'You are flying this thing.' };
+  if (percent >= 50) return { name: 'Copilot', line: 'You know the route, not the engine.' };
   return { name: 'Passenger', line: 'Your agent is flying. You are in seat 34B.' };
 }
 

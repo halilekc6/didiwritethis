@@ -17,8 +17,8 @@ const TRACK = '#34322c';
 const BACKGROUND = '#17160f';
 
 export function accentFor(percent: number): string {
-  if (percent >= 70) return '#7bd88f';
-  if (percent >= 40) return '#ffd166';
+  if (percent >= 80) return '#7bd88f';
+  if (percent >= 50) return '#ffd166';
   return '#ff6b5e';
 }
 

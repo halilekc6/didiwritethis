@@ -176,10 +176,10 @@ test('scoreAttempts leaves flagged questions out and lists weak spots', () => {
 });
 
 test('rank boundaries', () => {
-  assert.equal(rankFor(39).name, 'Passenger');
-  assert.equal(rankFor(40).name, 'Copilot');
-  assert.equal(rankFor(69).name, 'Copilot');
-  assert.equal(rankFor(70).name, 'Pilot');
+  assert.equal(rankFor(49).name, 'Passenger');
+  assert.equal(rankFor(50).name, 'Copilot');
+  assert.equal(rankFor(79).name, 'Copilot');
+  assert.equal(rankFor(80).name, 'Pilot');
 });
 
 test('buildQuiz retries bad JSON and drops unconfirmed questions', async () => {

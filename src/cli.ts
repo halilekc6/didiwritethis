@@ -18,7 +18,7 @@ Options:
   --agent <name>      Agent CLI to use: ${AGENTS.join(', ')} (default: first one found)
   --questions <n>     Number of questions (default: 10)
   --files <n>         Number of files to quiz on (default: 8)
-  --out <path>        Where to write the score card (default: didiwritethis-card.png)
+  --out <path>        Where to write the score card (default: ~/.didiwritethis/card.png)
   --no-card           Do not write a score card
   --list              Show which files would be sent, then stop
   -y, --yes           Skip the confirmation before sending code to your agent
@@ -107,7 +107,7 @@ async function takeQuiz(questions: Question[], reader: Reader): Promise<Attempt[
 }
 
 function printScore(score: Score) {
-  const tint = score.percent >= 70 ? green : score.percent >= 40 ? yellow : red;
+  const tint = score.percent >= 80 ? green : score.percent >= 50 ? yellow : red;
   console.log(`\n${bold('You understand')} ${bold(tint(`${score.percent}%`))} ${bold('of this repo.')}`);
   console.log(`${bold(score.rank.name)}: ${score.rank.line}\n`);
   console.log(`  Score:      ${score.correct}/${score.total} questions`);
@@ -135,7 +135,7 @@ async function main(): Promise<number> {
       agent: { type: 'string' },
       questions: { type: 'string', default: '10' },
       files: { type: 'string', default: '8' },
-      out: { type: 'string', default: 'didiwritethis-card.png' },
+      out: { type: 'string' },
       'no-card': { type: 'boolean', default: false },
       list: { type: 'boolean', default: false },
       yes: { type: 'boolean', short: 'y', default: false },
@@ -215,7 +215,7 @@ async function main(): Promise<number> {
     saveResult(score);
 
     if (!values['no-card']) {
-      const path = resolve(values.out);
+      const path = values.out ? resolve(values.out) : join(homedir(), '.didiwritethis', 'card.png');
       const date = new Date().toISOString().slice(0, 10);
       writeFileSync(path, renderCard(score, date));
       console.log(`\n${bold('Score card:')} ${path}`);
