@@ -8,6 +8,8 @@ npx didiwritethis
 
 Ten questions about your own repo, three minutes, one honest score. No account, no API key, no git hook.
 
+![Demo of a run on the chalk repo, with scripted answers](assets/demo.gif)
+
 ![An example score card showing 50 percent understood](assets/card-example.png)
 
 ## Why
@@ -20,8 +22,8 @@ The trial was small and measured short-term understanding of one library. So mea
 
 1. **Picks files.** It takes the source files with the most recent changes and favours commits that credit an agent. Most agent code is not labelled, so this is a heuristic, not a detector.
 2. **Asks first.** It shows which files will be sent and waits for your yes.
-3. **Writes the quiz.** Your agent CLI writes 14 questions about those files.
-4. **Checks the answers.** A second, blind pass answers every question. Questions it disagrees with are dropped.
+3. **Writes the quiz.** Your agent CLI writes more questions than it needs about those files.
+4. **Checks the answers.** A second, blind pass answers every question. Questions it disagrees with are dropped, and new ones replace them if needed.
 5. **Tests you.** You get 10 questions without the code: 5 on debugging, 3 on reading and 2 on concepts. Press `x` to flag a question as wrong, and it will not count.
 6. **Scores you.** Score = correct answers / counted questions. There is no hidden weighting.
 
@@ -33,9 +35,19 @@ The trial was small and measured short-term understanding of one library. So mea
 
 You get a PNG score card and a README badge.
 
+## Close the gaps
+
+A low score should lead somewhere. The coach skill reads your weak spots and teaches them without writing the code for you.
+
+```bash
+npx skills add halilekc6/didiwritethis
+```
+
+Then ask your agent: "Coach me on my weak spots from didiwritethis." When you finish, run the test again.
+
 ## Requirements
 
-- Node 20 or newer
+- macOS or Linux, with Node 20 or newer
 - A git repository with commit history
 - A signed-in agent CLI
 

@@ -7,7 +7,7 @@ import { parseArgs } from 'node:util';
 import { AGENTS, createRunner, detectAgent, isInstalled, type AgentName } from './agents.js';
 import { badgeMarkdown, renderCard } from './card.js';
 import { repoRoot, selectFiles, type Selection } from './git.js';
-import { buildQuiz, type Question } from './quiz.js';
+import { MIN_QUESTIONS, buildQuiz, type Question } from './quiz.js';
 import { scoreAttempts, type Attempt, type Score } from './score.js';
 
 const HELP = `didiwritethis: a 3-minute test of how much of your own repo you understand.
@@ -206,8 +206,8 @@ async function main(): Promise<number> {
     console.log(dim(`\n${questions.length} questions. You will not see the code while you answer.`));
     const attempts = await takeQuiz(questions, reader);
     const score = scoreAttempts(attempts);
-    if (score.total === 0) {
-      console.log('\nNo questions were answered, so there is no score.');
+    if (score.total < MIN_QUESTIONS) {
+      console.log(`\nAt least ${MIN_QUESTIONS} counted answers are needed for a score, so there is none.`);
       return 0;
     }
 
@@ -220,6 +220,9 @@ async function main(): Promise<number> {
       writeFileSync(path, renderCard(score, date));
       console.log(`\n${bold('Score card:')} ${path}`);
       console.log(`${bold('README badge:')}\n${badgeMarkdown(score)}`);
+    }
+    if (score.weakSpots.length > 0) {
+      console.log(dim('\nFix the gaps: npx skills add halilekc6/didiwritethis, then ask your agent to coach you.'));
     }
     return 0;
   } finally {

@@ -3,16 +3,50 @@
   "version": "0.1.0",
   "description": "A 3-minute test of how much of your own repo you actually understand.",
   "type": "module",
-  "bin": { "didiwritethis": "dist/cli.js" },
-  "files": ["dist/**/*.js", "!dist/**/*.test.js", "assets"],
-  "engines": { "node": ">=20" },
+  "bin": {
+    "didiwritethis": "dist/cli.js"
+  },
+  "files": [
+    "dist/**/*.js",
+    "!dist/**/*.test.js",
+    "assets/*.ttf",
+    "assets/OFL.txt",
+    "skills"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc",
     "test": "tsc && node --test \"dist/**/*.test.js\"",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "prepare": "tsc"
   },
-  "keywords": ["cli", "ai", "coding-agents", "claude-code", "codex", "gemini-cli", "comprehension-debt", "vibe-coding", "quiz"],
+  "keywords": [
+    "cli",
+    "ai",
+    "coding-agents",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "comprehension-debt",
+    "vibe-coding",
+    "quiz"
+  ],
   "license": "MIT",
-  "dependencies": { "@resvg/resvg-js": "^2.6.2" },
-  "devDependencies": { "@expo-google-fonts/jetbrains-mono": "^0.4.1", "@types/node": "^22.0.0", "typescript": "^5.6.0" }
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/halilekc6/didiwritethis.git"
+  },
+  "homepage": "https://github.com/halilekc6/didiwritethis#readme",
+  "bugs": {
+    "url": "https://github.com/halilekc6/didiwritethis/issues"
+  }
 }
