@@ -8,6 +8,7 @@ import { badgeMarkdown, renderCard } from './card.js';
 import { currentAuthors, isAgentCommit, isCandidate, parseLog, redact, selectFiles, type SourceFile } from './git.js';
 import {
   buildQuiz,
+  dropGuessable,
   keepConfirmed,
   parseJsonArray,
   pickMix,
@@ -161,6 +162,14 @@ test('keepConfirmed keeps only questions the blind pass agrees with', () => {
   assert.deepEqual(kept.map((q) => q.id), [0]);
 });
 
+test('dropGuessable removes questions a blind guess gets right', () => {
+  const kept = dropGuessable(
+    [question(0, 'debug', 1), question(1, 'debug', 2)],
+    [{ id: 0, answer: 1 }, { id: 1, answer: 0 }],
+  );
+  assert.deepEqual(kept.map((q) => q.id), [1]);
+});
+
 test('pickMix follows 5 debug, 3 read, 2 concept and fills gaps', () => {
   const pool = [
     ...Array.from({ length: 8 }, (_, i) => question(i, 'debug')),
@@ -208,6 +217,7 @@ test('buildQuiz retries bad JSON and drops unconfirmed questions', async () => {
     'not json',
     JSON.stringify(items),
     JSON.stringify(items.map((_, id) => ({ id, answer: id === 0 ? 3 : 1 }))),
+    '[{"id":1,"answer":1}]',
   ];
   const quiz = await buildQuiz(async () => replies.shift() ?? '', files, 5);
   assert.equal(quiz.length, 5);

@@ -37,6 +37,9 @@ About half are "debug" (a concrete failure: what breaks, why, or where to look),
 Rules:
 - The developer sees the question WITHOUT the code. Each question must make sense on its own and name the file and function it is about.
 - Test behaviour specific to this code, never generic programming trivia.
+- Test how the system works and why. Someone who understands the design, without having typed the line, must be able to answer.
+- Avoid rare edge cases that depend on one exact input string, and avoid exact output values unless they follow from the design.
+- A wrong option must not be ruled out by general programming knowledge alone. Guessing from the wording must not work.
 - Do not ask about exact names, line numbers, constants or syntax that only memorisation could answer.
 - Do not paste code longer than one line into a question.
 - Every question has exactly 4 options. All wrong options must be plausible to someone who skimmed the code.
@@ -66,6 +69,16 @@ ${JSON.stringify(blind, null, 1)}
 ${renderFiles(files)}`;
 }
 
+export function blindPrompt(questions: Question[]): string {
+  const blind = questions.map(({ id, question, options }) => ({ id, question, options }));
+  return `You cannot see the code these quiz questions are about. Pick the option that sounds most likely for each one.
+
+Reply with the JSON array and nothing else: no reasoning, no prose, no markdown fence. Format: [{"id":<id>,"answer":<0-3>}]
+
+Questions:
+${JSON.stringify(blind, null, 1)}`;
+}
+
 /** End of the balanced array that starts at `start`, ignoring brackets inside strings. */
 function arrayEnd(text: string, start: number): number {
   let depth = 0;
@@ -93,7 +106,7 @@ export function parseJsonArray(text: string): unknown[] {
     if (end === -1) continue;
     try {
       const value: unknown = JSON.parse(text.slice(start, end + 1));
-      if (Array.isArray(value) && value.length > (best?.length ?? 0)) best = value;
+      if (Array.isArray(value) && value.length > (best?.length ?? -1)) best = value;
     } catch {
       continue;
     }
@@ -156,6 +169,16 @@ export function keepConfirmed(questions: Question[], verdicts: unknown[]): Quest
     if (typeof v.id === 'number') answers.set(v.id, v.answer);
   }
   return questions.filter((q) => answers.get(q.id) === q.answer);
+}
+
+/** Leaves out questions a blind pass got right: those can reward wording over understanding. */
+export function dropGuessable(questions: Question[], guesses: unknown[]): Question[] {
+  const guessed = new Map<number, unknown>();
+  for (const guess of guesses) {
+    const g = guess as { id?: unknown; answer?: unknown };
+    if (typeof g.id === 'number') guessed.set(g.id, g.answer);
+  }
+  return questions.filter((q) => guessed.get(q.id) !== q.answer);
 }
 
 export function pickMix(questions: Question[], count: number): Question[] {
@@ -223,5 +246,14 @@ export async function buildQuiz(
     const reason = lastError ? ` (${String(lastError)})` : '';
     throw new Error(`only ${confirmed.length} questions survived the answer check${reason}`);
   }
-  return pickMix(shuffled(confirmed), count).map((q) => shuffleOptions(q));
+  const pool = shuffled(confirmed);
+  let hardFirst = pool;
+  try {
+    onProgress('Preferring questions that cannot be guessed');
+    const hard = dropGuessable(pool, parseJsonArray(await run(blindPrompt(pool))));
+    hardFirst = [...hard, ...pool.filter((q) => !hard.includes(q))];
+  } catch {
+    // Ordering is an improvement, not a requirement, so the quiz goes on without it.
+  }
+  return pickMix(hardFirst, count).map((q) => shuffleOptions(q));
 }
